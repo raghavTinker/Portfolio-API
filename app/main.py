@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import aiofiles
+import sqlite3
 app = FastAPI()
 
 @app.get("/")
@@ -12,7 +13,7 @@ def profile():
                 "linkedin": "https://in.linkedin.com/in/raghavtinker",
                 "github": "https://github.com/raghavTinker"
             },
-            "about": "I am Raghav Sharma, a tech enthusiast, and an avid programmer. Currently, I am in my second year at Thapar Institute of Technology pursuing my bachelor's in Computer Science engineering. I create innovative solutions for everyday problems. I am a hardworking student who enjoys tinkering with electronics and aims to solve core issues with technology. My domain is mainly in backend development, DevOps, and automation.",
+            "about": "A tech enthusiast, and an avid programmer. Currently, I am in my second year at Thapar Institute of Technology pursuing my bachelor's in Computer Science engineering. I create innovative solutions for everyday problems. I am a hardworking student who enjoys tinkering with electronics and aims to solve core issues with technology. My domain is mainly in backend development, DevOps, and automation.",
             "paths": {
                 "homepage": "https://raghavtinker.servatom.com/",
                 "experience": "https://raghavtinker.servatom.com/exp",
