@@ -2,7 +2,12 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import aiofiles
 import sqlite3
+import app.models
+from sqlalchemy.orm import Session
+from database import SessionLocal, engine
+
 app = FastAPI()
+models.Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def profile():
