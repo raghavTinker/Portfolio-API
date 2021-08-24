@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import aiofiles
 import sqlite3
-import app.models
+import app.models as models
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine
+from app.database import SessionLocal, engine
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
