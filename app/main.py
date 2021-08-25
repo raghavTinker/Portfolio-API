@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 import aiofiles
 import sqlite3
@@ -8,6 +8,12 @@ from app.database import SessionLocal, engine
 from pydantic import BaseModel
 from typing import List
 from app.models import Project, Tags, WorkDone
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import secrets
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
@@ -26,6 +32,27 @@ def get_db():
     finally:
         db.close()
 
+# security
+# get username and password from environment OS
+
+username = os.getenv("USERNAME")
+password = os.getenv("PASSWORD")
+
+print(username)
+print(password)
+
+security = HTTPBasic()
+
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, username)
+    correct_password = secrets.compare_digest(credentials.password, password)
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 @app.get("/")
 def profile():
@@ -66,61 +93,22 @@ def skills():
 @app.get("/projects")
 def projects():
     return {
-        "projects": [
-                {
-                    "name": "Notion-DiscordBot",
-                    "description": "A link management system using Python consuming Notion API to manage links in Notion via Discord",
-                    "tags": ["python", "docker", "google drive API", "notion-api"],
-                    "date": "July 2021",
-                    "work_done": ["Setup Google Drive API to upload files in Gdrive", "Containerised the app to run as a docker container"],
-                    "link": "https://github.com/Servatom/Notion-DiscordBot"
-                },
-                {
-                    "name": "Notefy",
-                    "description": "A note-taking app with subtle yet attractive UI",
-                    "tags": ["drf", "django", "HTML", "css", "React.js", "rest api"],
-                    "date": "July 2021 - Present",
-                    "work_done": ["Built a REST service using Django Rest framework serving React frontend", "Implemented OAuth for the application"],
-                    "link": "https://github.com/Servatom/notefy"
-                },
-                {
-                    "name": "Smart-Home-Doorbell",
-                    "description": "Sends a photo to the owner of the house when a person rings the bell. Allows owner to communicate with guest",
-                    "tags": ["python", "telegram-bot-api", "Raspberry Pi", "GPIO", "iOT", "IBM Watson Text-Speech API"],
-                    "date": "February 2021",
-                    "work_done": ["Clicking photos from an onvif camera and storing it on a server", "Used Telegram Bot library for communication", "Converts message of owner to speech for the guest", "Using a combination of raspberry pis and central hub running on linux"],
-                    "link": "https://github.com/raghavTinker/Smart-Home-Doorbell"
-                },
-                {
-                    "name": "Home-lab-server",
-                    "description": "Built a homelab at home from scratch",
-                    "tags": ["linux", "networking", "server management", "virtualisation", "PC building", "docker", "kubernetes"],
-                    "date": "2015-Present",
-                    "work_done": ["samba file server, plex media server", "replacement for time capsule to backup macOS machines over Time Machine", "virtualisation server", "custom Pfsense home router serving internet to the house. It has two WANs for failover internet access", "windows VM backups all files of linux server", "iOT lab", "docker server deployed to test out different images", "runs a VM to host https://servatom.com/"],
-                    "link": ""
-                },
-                {
-                    "name": "discord-music-bot",
-                    "description": "A bot to play music from a discord channel",
-                    "tags": ["python", "discord", "music", "spotify", "spotify-api", "youtube-dl player"],
-                    "date": "July 2021",
-                    "work_done": ["Used spotify apis and youtube-dl player to play music", "containerised the application to enable running it in a docker container"],
-                    "link": "https://github.com/raghavtinker/discord-music-bot"
-                }
-            ]
+        "projects": []
         }
 
 @app.post("/createproject")
-def createproject(project_req: ProjectCreate, db: Session = Depends(get_db)):
+def createproject(project_req: ProjectCreate, db: Session = Depends(get_db), username: str = Depends(get_current_username)):
     project = Project()
     project.name = project_req.name
     project.description = project_req.description
     project.date = project_req.date
     project.link = project_req.link
-    db.add(project)
-
+    try:
+        db.add(project)
+        db.commit()
+    except:
+        return {"error": "project already added"}
     # get project id
-    db.commit()
     project_id = db.query(Project.id).filter(Project.name == project_req.name).first()
     project_id = project_id[0]
 
@@ -130,6 +118,7 @@ def createproject(project_req: ProjectCreate, db: Session = Depends(get_db)):
         tags.tag = i
         tags.project_id = project_id
         db.add(tags)
+    
     for i in project_req.work_done:
         work_done = WorkDone()
         work_done.work = i
