@@ -41,3 +41,26 @@ class UserModel(Base):
     username = Column(String(50), unique=True)
     # hashed password
     password = Column(String(250))
+
+class Experience(Base):
+    __tablename__ = "experience"
+    id = Column(Integer, primary_key=True)
+    role = Column(String(50))
+    org = Column(String(50))
+    date = Column(String(50))
+
+class Languages(Base):
+    __tablename__ = "languages"
+    id = Column(Integer, primary_key=True)
+    language = Column(String(50), unique=True)
+    proficiency = Column(String(50))
+    
+class Domains(Base):
+    __tablename__ = "domains"
+    id = Column(Integer, primary_key=True)
+    domain = Column(String(50), unique=True)
+
+class Tools(Base):
+    __tablename__ = "tools"
+    id = Column(Integer, primary_key=True)
+    tool = Column(String(50), unique=True)

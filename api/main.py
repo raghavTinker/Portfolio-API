@@ -5,9 +5,8 @@ import sqlite3
 import api.models as models
 from sqlalchemy.orm import Session
 from api.database import SessionLocal, engine
-from pydantic import BaseModel
-from typing import List
-from api.models import Project, Tags, WorkDone, UserModel
+from api.schemas import *
+from api.models import Project, Tags, WorkDone, UserModel, Tools, Domains, Languages, Experience
 from api.security import *
 import os
 
@@ -16,22 +15,6 @@ load_dotenv()
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
-
-class ProjectCreate(BaseModel):
-    name: str
-    description: str
-    date: str
-    tags: List[str]
-    work_done: List[str]
-    link: str
-
-class UserCreate(BaseModel):
-    username: str
-    password: str
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
 
 
 def get_db():
@@ -135,6 +118,13 @@ def projects(db: Session = Depends(get_db)):
         "projects": projectsList
         }
 
+@app.get("/resume")
+def resume():
+    return FileResponse("app/static/resume.pdf")
+
+
+# Admin stuff
+
 @app.post("/createproject")
 def createproject(project_req: ProjectCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     project = Project()
@@ -167,6 +157,47 @@ def createproject(project_req: ProjectCreate, db: Session = Depends(get_db), use
     db.commit()
     return {"message": "Project created"}
 
-@app.get("/resume")
-def resume():
-    return FileResponse("app/static/resume.pdf")
+@app.post('/create_exp')
+def createExp(experience_req: ExperienceCreate, user = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        experience = Experience()
+        experience.role = experience_req.role
+        experience.org = experience_req.org
+        experience.date = experience_req.date
+    except:
+        return {"error": "error in creating experience"}
+        
+@app.post('/languages')
+def createLanguages(languages_req: LanguageCreate, user = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        languages = Languages()
+        languages.language = languages_req.language
+        languages.proficiency = languages_req.proficiency
+        db.add(languages)
+        db.commit()
+    except:
+        return {"error": "error in creating languages"}
+
+@app.post('/tools')
+def createTools(tools_req: ToolCreate, user = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        tools = Tools()
+        tools.tool = tools_req.tool
+        db.add(tools)
+        db.commit()
+    except:
+        return {"error": "error in creating tools"}
+
+@app.post('/createdomains')
+def createDomains(domains_req: DomainCreate, user = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        domains = Domains()
+        domains.domain = domains_req.domain
+
+        # add to db
+        db.add(domains)
+        db.commit()
+
+        return {"message": "domain created {}".format(domains_req.domain)} 
+    except:
+        return {"error": "error in creating domains"}
