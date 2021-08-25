@@ -2,13 +2,13 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 import aiofiles
 import sqlite3
-import app.models as models
+import api.models as models
 from sqlalchemy.orm import Session
-from app.database import SessionLocal, engine
+from api.database import SessionLocal, engine
 from pydantic import BaseModel
 from typing import List
-from app.models import Project, Tags, WorkDone, UserModel
-from app.security import *
+from api.models import Project, Tags, WorkDone, UserModel
+from api.security import *
 import os
 
 from dotenv import load_dotenv
@@ -46,10 +46,14 @@ def get_db():
 @app.post('/signup')
 def signup(user_req: UserCreate, db: Session = Depends(get_db)):
     # has passwd
-    user = UserModel(username=user_req.username, password=hashMe(user_req.password))
-    db.add(user)
-    db.commit()
-    return {"status": "user_created"}
+    try:
+        user = UserModel(username=user_req.username, password=hashMe(user_req.password))
+        db.add(user)
+        db.commit()
+        return {"status": "user_created"}
+    except:
+        return {"status": "user_exists"}
+
 
 @app.post('/login')
 def login(user_req: UserLogin, db: Session = Depends(get_db)):

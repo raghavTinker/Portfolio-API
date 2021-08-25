@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  newportfolio:
-    image: newportfolio
+  portfolio:
+    image: portfolio
     build:
       context: .
       dockerfile: ./Dockerfile
