@@ -21,7 +21,7 @@ class Project(Base):
 class Tags(Base):
     __tablename__ = "tags"
     id = Column(Integer, primary_key=True)
-    tag = Column(String(50), unique=True)
+    tag = Column(String(50))
     # storing a list of strings in tags
     # storing a list
 
@@ -34,3 +34,10 @@ class WorkDone(Base):
     # storing a list
 
     project_id = Column(Integer, ForeignKey("projects.id"))
+
+class UserModel(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique=True)
+    # hashed password
+    password = Column(String(250))

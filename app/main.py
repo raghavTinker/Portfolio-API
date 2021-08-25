@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal, engine
 from pydantic import BaseModel
 from typing import List
-from app.models import Project, Tags, WorkDone
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-import secrets
+from app.models import Project, Tags, WorkDone, UserModel
+from app.security import *
 import os
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -25,6 +25,15 @@ class ProjectCreate(BaseModel):
     work_done: List[str]
     link: str
 
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
 def get_db():
     try :
         db = SessionLocal()
@@ -33,23 +42,30 @@ def get_db():
         db.close()
 
 # security
-# get username and password from environment OS
 
-username = os.getenv("USERNAME")
-password = os.getenv("PASSWORD")
+@app.post('/signup')
+def signup(user_req: UserCreate, db: Session = Depends(get_db)):
+    # has passwd
+    user = UserModel(username=user_req.username, password=hashMe(user_req.password))
+    db.add(user)
+    db.commit()
+    return {"status": "user_created"}
 
-security = HTTPBasic()
+@app.post('/login')
+def login(user_req: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(UserModel).filter_by(username=user_req.username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, username)
-    correct_password = secrets.compare_digest(credentials.password, password)
-    if not (correct_username and correct_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
+    if not verify_passwd(user_req.password, user.password):
+        raise HTTPException(status_code=401, detail="Incorrect creds")
+    
+
+    access_token = create_access_token(user.username)
+    return {"access_token": access_token, "type": "bearer"}
+
+
+# Routes
 
 @app.get("/")
 def profile():
@@ -88,13 +104,35 @@ def skills():
         }
 
 @app.get("/projects")
-def projects():
+def projects(db: Session = Depends(get_db)):
+    # get all the projects from the database
+
+    projectsList = []
+
+    for project in db.query(Project).all():
+        json = {}
+        print(project.name)
+        json["name"] = project.name
+        json["description"] = project.description
+        json["date"] = project.date
+        json["link"] = project.link
+
+        tags = []
+        work_done = []
+        for tagObj in project.tags:
+            tags.append(tagObj.tag)
+        json["tags"] = tags
+        for workObj in project.work_done:
+            work_done.append(workObj.work)
+        json["work_done"] = work_done
+        projectsList.append(json)
+    
     return {
-        "projects": []
+        "projects": projectsList
         }
 
 @app.post("/createproject")
-def createproject(project_req: ProjectCreate, db: Session = Depends(get_db), username: str = Depends(get_current_username)):
+def createproject(project_req: ProjectCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     project = Project()
     project.name = project_req.name
     project.description = project_req.description
