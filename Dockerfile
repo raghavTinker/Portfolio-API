@@ -21,4 +21,4 @@ USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
 CMD ["ls", "-la"]
-CMD ["python", "server.py"]
+CMD ["python", "frontApi.py"]

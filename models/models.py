@@ -1,8 +1,9 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from models.database import Base
 
+# Project stuff
 class Project(Base):
     __tablename__ = "projects"
     id = Column(Integer, primary_key=True)
@@ -35,6 +36,7 @@ class WorkDone(Base):
 
     project_id = Column(Integer, ForeignKey("projects.id"))
 
+# User model
 class UserModel(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -42,6 +44,7 @@ class UserModel(Base):
     # hashed password
     password = Column(String(250))
 
+# Experience model
 class Experience(Base):
     __tablename__ = "experience"
     id = Column(Integer, primary_key=True)
@@ -49,17 +52,20 @@ class Experience(Base):
     org = Column(String(50))
     date = Column(String(50))
 
+# Languages model
 class Languages(Base):
     __tablename__ = "languages"
     id = Column(Integer, primary_key=True)
     language = Column(String(50), unique=True)
     proficiency = Column(String(50))
-    
+
+# Domains model
 class Domains(Base):
     __tablename__ = "domains"
     id = Column(Integer, primary_key=True)
     domain = Column(String(50), unique=True)
 
+# tools model
 class Tools(Base):
     __tablename__ = "tools"
     id = Column(Integer, primary_key=True)
