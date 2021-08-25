@@ -11,7 +11,7 @@ class Project(Base):
     # storing a list of strings in tags
     # storing a list
 
-    tags = relationship("Tag", backref="project")
+    tags = relationship("Tags", backref="project")
     link = Column(String(250))
     # date
     date = Column(String(50))
@@ -26,8 +26,6 @@ class Tags(Base):
     # storing a list
 
     project_id = Column(Integer, ForeignKey("projects.id"))
-    project = relationship("Project", backref="tags")
-
 class WorkDone(Base):
     __tablename__ = "work_done"
     id = Column(Integer, primary_key=True)
@@ -36,4 +34,3 @@ class WorkDone(Base):
     # storing a list
 
     project_id = Column(Integer, ForeignKey("projects.id"))
-    project = relationship("Project", backref="work_done")
