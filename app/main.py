@@ -38,9 +38,6 @@ def get_db():
 username = os.getenv("USERNAME")
 password = os.getenv("PASSWORD")
 
-print(username)
-print(password)
-
 security = HTTPBasic()
 
 def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
