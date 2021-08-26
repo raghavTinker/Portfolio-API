@@ -141,5 +141,12 @@ def delete_proj(project_req: DeleteProject, db: Session = Depends(get_db), user 
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     db.delete(project)
+    tags = db.query(Tags).filter_by(project_id=project_req.id).all()
+    for i in tags:
+        db.delete(i)
+    work_done = db.query(WorkDone).filter_by(project_id=project_req.id).all()
+    for i in work_done:
+        db.delete(i)
+    db.commit()
     db.commit()
     return {"message": "project deleted"}
