@@ -84,6 +84,7 @@ def projects(db: Session = Depends(get_db)):
     for project in db.query(Project).all():
         json = {}
         print(project.name)
+        json["id"] = project.id
         json["name"] = project.name
         json["description"] = project.description
         json["date"] = project.date

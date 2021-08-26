@@ -134,3 +134,12 @@ def login(user_req: UserLogin, db: Session = Depends(get_db)):
 
     access_token = create_access_token(user.username)
     return {"access_token": access_token, "type": "bearer"}
+
+@app.post('/delete_proj')
+def delete_proj(project_req: DeleteProject, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    project = db.query(Project).filter_by(id=project_req.id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db.delete(project)
+    db.commit()
+    return {"message": "project deleted"}

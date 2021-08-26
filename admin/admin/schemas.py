@@ -31,3 +31,7 @@ class ExperienceCreate(BaseModel):
     role: str
     org: str
     date: str
+
+class DeleteProject(BaseModel):
+    id: int
+    
