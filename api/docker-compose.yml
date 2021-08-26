@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  newportfolio:
+    image: portfolio_api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    environment: 
+      - SECRET_KEY=KEY
+    volumes:
+      - ../database/portfolio.db:/app/database/portfolio.db
+      - ../database/static/:/app/database/static/

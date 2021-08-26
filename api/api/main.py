@@ -5,7 +5,6 @@ import sqlite3
 import models.models as models
 from sqlalchemy.orm import Session
 from models.database import SessionLocal, engine
-from admin.schemas import *
 from models.models import Project, Tags, WorkDone, UserModel, Tools, Domains, Languages, Experience
 import os
 
@@ -91,4 +90,4 @@ def projects(db: Session = Depends(get_db)):
 
 @app.get("/resume")
 def resume():
-    return FileResponse("database/resume.pdf")
+    return FileResponse("database/static/resume.pdf")

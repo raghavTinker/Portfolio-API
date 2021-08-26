@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  newportfolio:
+    image: admin_portal
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "9000:9000"
+    environment: 
+      - SECRET_KEY=KEY
+    volumes:
+      - ../database/portfolio.db:/app/database/portfolio.db
+      - ../database/static/:/app/database/static/

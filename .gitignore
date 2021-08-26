@@ -2,3 +2,4 @@
 *.pem
 .env
 portfolio.db
+compose-sample
