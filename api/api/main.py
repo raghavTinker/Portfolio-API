@@ -44,20 +44,35 @@ def profile():
         }
 
 @app.get("/exp")
-def experience():
+def experience(db: Session = Depends(get_db)):
+    jobs = []
+    for exp in db.query(Experience).all():
+        job = {exp.role: [exp.org, exp.date]}
+        jobs.append(job)
     return {
-            "experience":{
-                "Microsoft Learn Student Chapter" : ["Executive Member", "2021-present"],
-                "Linux User Group": ["Executive Member", "2020-present"]
-            }
+            "experience": jobs
         }
 
 @app.get("/skills")
-def skills():
+def skills(db: Session = Depends(get_db)):
+    # get languages in an array
+    languages = []
+    for lang in db.query(Languages).all():
+        languages.append({"language": lang.language, "proficiency": lang.proficiency})
+    
+    tools = []
+    for tool in db.query(Tools).all():
+        tools.append(tool.tool)
+
+    print(tools)
+    
+    domains = []
+    for domain in db.query(Domains).all():
+        domains.append(domain.domain)
     return {
-            "languages": ["Python", "C", "C++", "Swift", "Bash Scripting"],
-            "tools": ["git", "github", "travis-ci", "vs-code", "vim", "linux", "Jupyter Notebooks", "docker", "k8s"],
-            "domains": ["DevOps", "Automation", "iOT", "server management", "iOS app development"]
+            "languages": languages,
+            "tools": tools,
+            "domains": domains
         }
 
 @app.get("/projects")
@@ -83,7 +98,7 @@ def projects(db: Session = Depends(get_db)):
             work_done.append(workObj.work)
         json["work_done"] = work_done
         projectsList.append(json)
-    
+    db.close()
     return {
         "projects": projectsList
         }
