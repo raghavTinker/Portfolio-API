@@ -34,4 +34,39 @@ class ExperienceCreate(BaseModel):
 
 class DeleteProject(BaseModel):
     id: int
-    
+
+class DeleteProjectTag(BaseModel):
+    id: int
+
+class DeleteExperience(BaseModel):
+    id: int
+
+class UpdateProjectTag(BaseModel):
+    project_id: int
+    tag: str
+
+class UpdateProjectWork(BaseModel):
+    project_id: int
+    work_done: str
+
+class UpdateProjectName(BaseModel):
+    project_id: int
+    name: str
+
+class UpdateProjectDescription(BaseModel):
+    project_id: int
+    description: str
+
+class UpdateProjectLink(BaseModel):
+    project_id: int
+    link: str
+
+class UpdateProjectDate(BaseModel):
+    project_id: int
+    date: str
+
+class DeleteLanguage(BaseModel):
+    id: int
+
+class DeleteTool(BaseModel):
+    id: int

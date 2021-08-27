@@ -47,7 +47,12 @@ def profile():
 def experience(db: Session = Depends(get_db)):
     jobs = []
     for exp in db.query(Experience).all():
-        job = {exp.role: [exp.org, exp.date]}
+        job = {
+            "id": exp.id,
+            "organisation": exp.org,
+            "role": exp.role,
+            "duration": exp.date,
+        }
         jobs.append(job)
     return {
             "experience": jobs
