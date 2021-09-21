@@ -2,14 +2,13 @@ version: '3.4'
 
 services:
   newportfolio:
-    image: admin_portal
+    image: adminportal_api
     build:
       context: .
       dockerfile: ./Dockerfile
     ports:
       - "9000:9000"
     environment: 
-      - SECRET_KEY=KEY
+      - SECRET_KEY=9755c277143e96ecb713d3e6560a93eda0293ad6cd27a59c5472cbdd79f47dca
     volumes:
       - ../database/portfolio.db:/app/database/portfolio.db
-      - ../database/static/:/app/database/static/

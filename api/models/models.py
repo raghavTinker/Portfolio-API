@@ -13,6 +13,7 @@ class Project(Base):
     # storing a list
 
     tags = relationship("Tags", backref="project")
+    repo_link = Column(String(250))
     link = Column(String(250))
     # date
     date = Column(String(50))

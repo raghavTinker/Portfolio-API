@@ -8,6 +8,7 @@ class ProjectCreate(BaseModel):
     tags: List[str]
     work_done: List[str]
     link: str
+    repo_link: str
 
 class UserCreate(BaseModel):
     username: str
@@ -60,6 +61,10 @@ class UpdateProjectDescription(BaseModel):
 class UpdateProjectLink(BaseModel):
     project_id: int
     link: str
+
+class UpdateProjectRepoLink(BaseModel):
+    project_id: int
+    repo_link: str
 
 class UpdateProjectDate(BaseModel):
     project_id: int

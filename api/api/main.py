@@ -94,6 +94,7 @@ def projects(db: Session = Depends(get_db)):
         json["description"] = project.description
         json["date"] = project.date
         json["link"] = project.link
+        json["repo_link"] = project.repo_link
 
         tags = []
         work_done = []

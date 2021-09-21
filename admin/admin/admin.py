@@ -32,6 +32,7 @@ def createproject(project_req: ProjectCreate, db: Session = Depends(get_db), use
     project.description = project_req.description
     project.date = project_req.date
     project.link = project_req.link
+    project.repo_link = project_req.repo_link
     try:
         db.add(project)
         db.commit()
@@ -242,6 +243,15 @@ def update_link(link_req: UpdateProjectLink, db: Session = Depends(get_db), user
     project.link = link_req.link
     db.commit()
     return {"message": "project link updated"}
+
+@app.put('/update/project/repo_link')
+def update_link(link_req: UpdateProjectRepoLink, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    project = db.query(Project).filter_by(project_id=link_req.project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    project.repo_link = link_req.repo_link
+    db.commit()
+    return {"message": "project repo_link updated"}
 
 @app.put('/update/project/date')
 def update_date(date_req: UpdateProjectDate, db: Session = Depends(get_db), user = Depends(get_current_user)):
